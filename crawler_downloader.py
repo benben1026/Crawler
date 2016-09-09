@@ -4,6 +4,27 @@ import random
 import sys
 import time
 import urllib3
+import threading
+
+class DownloadThread:
+    def __init__(self):
+        threading.Thread.__init__(self)
+    def run(self):
+        response = self.proxy_manager.request(
+                'GET',
+                self.url,
+                preload_content = False,
+            )
+        return
+
+    def download(self, pm, url):
+        response = pm.request(
+                    'GET',
+                    url,
+                    preload_content = False,
+                )
+        return response.read()
+
 
 class CrawlerDownloader:
     def __init__(self, tor_port_list, port_switch_threshold, max_retry_time = 5, conn_timeout = 10, read_timeout = 10):

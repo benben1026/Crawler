@@ -29,6 +29,10 @@ def mapper_download_batch(urls, downloader):
     downloader.set_url(urls)
     return downloader.batch_download_content() 
 
+def mapper_download_partition(urls, downloader):
+    downloader.set_url(urls)
+    return downloader.batch_download_content()
+
 def mapper_parse(htmltuple, rules_include, rules_exclude):
     if(htmltuple[1] is not None):
         res=ct.parse_browser_removetag_userules(htmltuple[0], htmltuple[1], rules_include, rules_exclude)
@@ -63,6 +67,7 @@ def crawler_run(config, existing_progress=None):
     next_len = 1
 
     while next_len:
+        '''
         if config.group_url and iter >= 1:
             log_msg("converting")
             this_round_urls = fe.env.parallelize(ct.group_urls(this_round_urls.collect(), config.group_url))
@@ -71,6 +76,9 @@ def crawler_run(config, existing_progress=None):
         else:    
             log_msg("downloading")
             this_round_htmltuple = this_round_urls.map(lambda url: mapper_download(url, downloader)).cache()
+        '''    
+        log_msg("downloading")
+        this_round_htmltuple = this_round_urls.map_partition(lambda urls: mapper_download(urls, downloader)).cache()
         iter += 1
         log_msg("writing to hdfs")
         parse_html(config, this_round_htmltuple).write_to_hdfs(config.hdfspath_output) #write to hdfs
